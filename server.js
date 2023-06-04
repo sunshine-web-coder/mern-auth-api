@@ -3,12 +3,13 @@ const connectDB = require("./config/db");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 // const path = require("path");
+const cors = require('cors');
 const authRoutes = require("./routes/auth");
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-
+app.use(cors());
 // MongoDB connection
 connectDB();
 
