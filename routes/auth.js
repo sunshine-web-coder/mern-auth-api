@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/UserModels');
-const mongoose = require('mongoose');
 
 // User registration
 router.post('/register', async (req, res) => {
@@ -117,43 +116,6 @@ router.delete('/:id', async (req, res) => {
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     console.error('Delete user error:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-// User profile
-router.get('/profile', async (req, res) => {
-    try {
-      // Get the user ID from the request object
-      const { userId } = req;
-  
-      // Validate the userId
-      if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return res.status(400).json({ message: 'Invalid user ID' });
-      }
-  
-      // Find the user by ID
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      res.json(user);
-    } catch (error) {
-      console.error('User profile error:', error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  });
-
-// User logout
-router.post('/logout', (req, res) => {
-  try {
-    // Clear the token from the client (e.g., remove it from local storage)
-    // ...
-
-    res.json({ message: 'User logged out successfully' });
-  } catch (error) {
-    console.error('User logout error:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
