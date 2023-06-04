@@ -121,23 +121,25 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Get user details
-router.get('/user', async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
-      // Retrieve the user ID from the authorization token
-      const userId = req.user.userId;
+      const { id } = req.params;
   
-      // Find the user by ID
-      const user = await User.findById(userId);
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'Invalid user ID' });
+      }
+  
+      const user = await User.findById(id);
+  
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
   
       res.json(user);
     } catch (error) {
-      console.error('Fetch user error:', error);
+      console.error('Get user by ID error:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
-  });
-  
+  });  
 
 module.exports = router;
