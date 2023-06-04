@@ -58,66 +58,98 @@ router.post('/login', async (req, res) => {
 
 // Get all users
 router.get('/', async (req, res) => {
-    try {
-      const users = await User.find();
-      res.json(users);
-    } catch (error) {
-      console.error('Get all users error:', error);
-      res.status(500).json({ message: 'Internal server error' });
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    console.error('Get all users error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Get user by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
-  });
-  
-  // Get user by ID
-  router.get('/:id', async (req, res) => {
-    try {
-      const user = await User.findById(req.params.id);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.json(user);
-    } catch (error) {
-      console.error('Get user by ID error:', error);
-      res.status(500).json({ message: 'Internal server error' });
+    res.json(user);
+  } catch (error) {
+    console.error('Get user by ID error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Update user by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { username, password: hashedPassword },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
     }
-  });
-  
-  // Update user by ID
-  router.put('/:id', async (req, res) => {
-    try {
-      const { username, password } = req.body;
-  
-      // Hash the new password
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
-        { username, password: hashedPassword },
-        { new: true }
-      );
-  
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      res.json(updatedUser);
-    } catch (error) {
-      console.error('Update user error:', error);
-      res.status(500).json({ message: 'Internal server error' });
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error('Update user error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Delete user by ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' });
     }
-  });
-  
-  // Delete user by ID
-  router.delete('/:id', async (req, res) => {
-    try {
-      const deletedUser = await User.findByIdAndDelete(req.params.id);
-      if (!deletedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.json({ message: 'User deleted successfully' });
-    } catch (error) {
-      console.error('Delete user error:', error);
-      res.status(500).json({ message: 'Internal server error' });
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// User profile
+router.get('/profile', async (req, res) => {
+  try {
+    // Get the user ID from the request object
+    const { userId } = req;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
-  });
+
+    res.json(user);
+  } catch (error) {
+    console.error('User profile error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// User logout
+router.post('/logout', (req, res) => {
+  try {
+    // Clear the token from the client (e.g., remove it from local storage)
+    // ...
+
+    res.json({ message: 'User logged out successfully' });
+  } catch (error) {
+    console.error('User logout error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 module.exports = router;
