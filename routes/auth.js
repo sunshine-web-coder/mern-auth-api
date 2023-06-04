@@ -120,4 +120,24 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Get user details
+router.get('/user', async (req, res) => {
+    try {
+      // Retrieve the user ID from the authorization token
+      const userId = req.user.userId;
+  
+      // Find the user by ID
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.json(user);
+    } catch (error) {
+      console.error('Fetch user error:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  
+
 module.exports = router;
